@@ -40,11 +40,68 @@ vector<vector<double>> leerCSV(const string& nombreArchivo) {
     return datos;
 }
 
+vector<vector<double>> estandarizar(const vector<vector<double>>& matriz) {
+    vector<double> media;
+    vector<double> desviacionEstandar;
+    vector<vector<double>> matrizE;
+
+    int row = matriz.size();
+    int col = matriz[0].size();
+
+    double sum = 0;
+    double avg = 0;
+
+    //media
+    for (int i = 0; i < col; i++) {
+        for (int j = 0; j < row; j++) {
+            sum += matriz[j][i];
+        }
+        avg = sum / row;
+        media.push_back(avg);
+        sum = 0;
+    }
+
+    double sum2 = 0;
+
+    //desviacion estandar
+    for (int i = 0; i < col; i++) {
+        for (int j = 0; j < row; j++) {
+            sum2 += pow(matriz[j][i] - media[i],2);
+        }
+        avg = sqrt(sum2 / row);
+        desviacionEstandar.push_back(avg);
+        sum2 = 0;
+    }
+
+    double x = 0;
+    vector<double> temp;
+    //estandarizar
+    for (int i = 0; i < row; i++) {
+        for (int j = 0; j < col; j++) {
+            if(desviacionEstandar[j] != 0){
+                x = (matriz[i][j] - media[j]) / desviacionEstandar[j];
+                temp.push_back(x);
+            }
+            else {
+                temp.push_back(0);
+            }
+            
+        }
+        matrizE.push_back(temp);
+        temp.clear();
+    }
+
+    return matrizE;
+}
 
 void imprimirMatriz(const vector<vector<double>>& matriz) {
-    for (const auto& fila : matriz) {
-        for (double valor : fila) {
-            cout << valor << "\t";
+    int row = matriz.size();
+    int col = matriz[0].size();
+
+
+    for (int i = 0; i < row; i++) {
+        for (int j = 0; j < col; j++) {
+            cout << matriz[i][j] << "\t";
         }
         cout << endl;
     }
@@ -52,5 +109,8 @@ void imprimirMatriz(const vector<vector<double>>& matriz) {
 
 int main(){
     imprimirMatriz(leerCSV("EjemploEstudiantes.csv"));
+    cout << endl << endl;
+
+    imprimirMatriz(estandarizar(leerCSV("EjemploEstudiantes.csv")));
 }
 
