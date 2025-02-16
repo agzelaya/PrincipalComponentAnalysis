@@ -68,7 +68,8 @@ vector<vector<double>> estandarizar(const vector<vector<double>>& matriz) {
         for (int j = 0; j < row; j++) {
             sum2 += pow(matriz[j][i] - media[i],2);
         }
-        avg = sqrt(sum2 / row);
+        avg = sqrt(sum2 / (row - 1));
+
         desviacionEstandar.push_back(avg);
         sum2 = 0;
     }
@@ -94,6 +95,33 @@ vector<vector<double>> estandarizar(const vector<vector<double>>& matriz) {
     return matrizE;
 }
 
+vector<vector<double>> correlaciones(const vector<vector<double>>& matriz) {
+    vector<vector<double>> matrizCorrelacion;
+
+    vector<double> temp;
+
+    int row = matriz.size();
+    int col = matriz[0].size();
+
+    double sum = 0;
+    double val = 0;
+
+    for (int i = 0; i < col; i++) {
+        for (int j = 0; j < col; j++) {
+            for (int k = 0; k < row; k++) {
+                sum += matriz[k][i] * matriz[k][j];
+            }
+            val = sum / (row - 1);
+            temp.push_back(val);
+            sum = 0;
+        }
+        matrizCorrelacion.push_back(temp);
+        temp.clear();
+    }
+
+    return matrizCorrelacion;
+}
+
 void imprimirMatriz(const vector<vector<double>>& matriz) {
     int row = matriz.size();
     int col = matriz[0].size();
@@ -111,6 +139,12 @@ int main(){
     imprimirMatriz(leerCSV("EjemploEstudiantes.csv"));
     cout << endl << endl;
 
-    imprimirMatriz(estandarizar(leerCSV("EjemploEstudiantes.csv")));
+    vector<vector<double>> estandarizada = estandarizar(leerCSV("EjemploEstudiantes.csv"));
+
+    imprimirMatriz(estandarizada);
+
+    cout << endl << endl;
+
+    imprimirMatriz(correlaciones(estandarizada));
 }
 
