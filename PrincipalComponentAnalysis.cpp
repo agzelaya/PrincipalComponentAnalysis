@@ -85,6 +85,7 @@ vector<vector<double>> estandarizar(const vector<vector<double>>& matriz) {
             sum2 += pow(matriz[j][i] - media[i],2);
         }
         avg = sqrt(sum2 / (row - 1));
+		cout << avg << endl;
 
         desviacionEstandar.push_back(avg);
         sum2 = 0;
@@ -184,12 +185,67 @@ pair<vector<double>, vector<vector<double>>> calcularValoresVectoresPropios(cons
     return{valoresOV, vectoresOrdenados};
 }
 
+vector<vector<double>> componentes(const vector<vector<double>>& matrizX, const vector<vector<double>>& matrizV) {
+    vector<vector<double>> matrizC;
+    vector<double> temp;
 
+    int row = matrizX.size();
+    int col = matrizV[0].size();
+	int com_value = matrizX[0].size();//valor comun de matrices
+	double calculo = 0;//variable para los calculos de cada elemento de la matriz
+
+    for (int i = 0; i < row; i++)
+    {
+        for (int j = 0; j < col; j++)
+        {
+            for (int k = 0; k < com_value; k++)
+            {
+				calculo += matrizX[i][k] * matrizV[k][j];
+            }
+			temp.push_back(calculo);
+            calculo = 0;
+
+        }
+		matrizC.push_back(temp);
+		temp.clear();
+    }
+
+    return matrizC;
+}
+
+vector<vector<double>> calidades(const vector<vector<double>>& matrizX, const vector<vector<double>>& matrizC) {
+    vector<vector<double>> matrizQ;
+    vector<double> temp;
+
+    int row = matrizX.size();
+    int col = matrizX[0].size();
+    double calculo = 0, suma = 0;//variable para los calculos de cada elemento de la matriz
+
+    for (int i = 0; i < row; i++)
+    {
+        for (int j = 0; j < col; j++)
+        {
+            //Sumatoria
+            for (int k = 0; k < col; k++)
+            {
+                suma += (matrizX[i][k]) * (matrizX[i][k]);
+            }
+			calculo = (matrizX[i][j] * matrizX[i][j]) / suma;
+			temp.push_back(calculo);
+			calculo = 0;
+			suma = 0;
+        }
+		matrizQ.push_back(temp);
+		temp.clear();
+    }
+    return matrizQ;
+}
 
 int main(){
 
     cout << " == Matriz original ==" << endl;
-    imprimirMatriz(leerCSV("EjemploEstudiantes.csv"));
+	vector<vector<double>> original = leerCSV("EjemploEstudiantes.csv");
+    imprimirMatriz(original);
     cout << endl << endl;
 
     vector<vector<double>> estandarizada = estandarizar(leerCSV("EjemploEstudiantes.csv"));
@@ -216,5 +272,16 @@ int main(){
 
     cout << " == Vectores propios ==" << endl;
     imprimirMatriz(autovectores);
+    cout << endl ;
+
+    cout << " == Matriz de componentes principales ==" << endl;
+    vector<vector<double>> componentesP = componentes(estandarizada,autovectores);
+    imprimirMatriz(componentesP);
+    cout << endl ;
+
+    cout << " == Matriz de calidades de individuos ==" << endl;
+    vector<vector<double>> calidadesI = calidades(original,componentesP);
+    imprimirMatriz(calidadesI);
+    cout << endl;
 }
 
