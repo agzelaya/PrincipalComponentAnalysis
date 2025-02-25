@@ -223,17 +223,17 @@ vector<vector<double>> calidades(const vector<vector<double>>& matrizX, const ve
 
     for (int i = 0; i < row; i++)
     {
+        //Sumatoria
+        for (int k = 0; k < col; k++)
+        {
+            suma += (matrizX[i][k]) * (matrizX[i][k]);
+        }
+        suma = 0;
+
         for (int j = 0; j < col; j++)
         {
-            //Sumatoria
-            for (int k = 0; k < col; k++)
-            {
-                suma += (matrizX[i][k]) * (matrizX[i][k]);
-            }
-			calculo = (matrizX[i][j] * matrizX[i][j]) / suma;
+			calculo = (matrizC[i][j] * matrizC[i][j]) / suma;
 			temp.push_back(calculo);
-			calculo = 0;
-			suma = 0;
         }
 		matrizQ.push_back(temp);
 		temp.clear();
@@ -280,7 +280,7 @@ int main(){
     cout << endl ;
 
     cout << " == Matriz de calidades de individuos ==" << endl;
-    vector<vector<double>> calidadesI = calidades(original,componentesP);
+    vector<vector<double>> calidadesI = calidades(estandarizada,componentesP);
     imprimirMatriz(calidadesI);
     cout << endl;
 }
