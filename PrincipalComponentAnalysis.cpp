@@ -84,7 +84,7 @@ vector<vector<double>> estandarizar(const vector<vector<double>>& matriz) {
         for (int j = 0; j < row; j++) {
             sum2 += pow(matriz[j][i] - media[i],2);
         }
-        avg = sqrt(sum2 / (row - 1));
+        avg = sqrt(sum2 / (row ));
 		cout << avg << endl;
 
         desviacionEstandar.push_back(avg);
@@ -128,7 +128,7 @@ vector<vector<double>> correlaciones(const vector<vector<double>>& matriz) {
             for (int k = 0; k < row; k++) {
                 sum += matriz[k][i] * matriz[k][j];
             }
-            val = sum / (row - 1);
+            val = sum / (row );
             temp.push_back(val);
             sum = 0;
         }
@@ -224,11 +224,11 @@ vector<vector<double>> calidades(const vector<vector<double>>& matrizX, const ve
     for (int i = 0; i < row; i++)
     {
         //Sumatoria
+        suma = 0;
         for (int k = 0; k < col; k++)
         {
             suma += (matrizX[i][k]) * (matrizX[i][k]);
         }
-        suma = 0;
 
         for (int j = 0; j < col; j++)
         {
