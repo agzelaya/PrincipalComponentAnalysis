@@ -254,6 +254,21 @@ vector<vector<double>> coordenadasVariables(const vector<double>& valoresPropios
     return matrizT;
 }
 
+vector<vector<double>> calidadesVariables(const vector<vector<double>>& matrizT, const vector<double>& valoresPropios) {
+    int filas = matrizT.size();
+    int columnas = matrizT[0].size();
+
+    vector<vector<double>> matrizS(filas, vector<double>(columnas));
+
+    for (int i = 0; i < filas; i++) {
+        for (int j = 0; j < columnas; j++) {
+            matrizS[i][j] = (matrizT[i][j] * matrizT[i][j]) / valoresPropios[j];
+        }
+    }
+    return matrizS;
+}
+
+
 int main(){
 
     cout << " == Matriz original ==" << endl;
@@ -300,6 +315,11 @@ int main(){
     cout << " == Matriz de coordenadas de variables ==" << endl;
     vector<vector<double>> matrizT = coordenadasVariables(autovalores, autovectores);
     imprimirMatriz(matrizT);
+    cout << endl;
+
+    cout << " == Matriz de calidades de variables ==" << endl;
+    vector<vector<double>> matrizS = calidadesVariables(matrizT, autovalores);
+    imprimirMatriz(matrizS);
     cout << endl;
 }
 
