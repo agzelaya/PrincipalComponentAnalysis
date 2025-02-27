@@ -241,6 +241,46 @@ vector<vector<double>> calidades(const vector<vector<double>>& matrizX, const ve
     return matrizQ;
 }
 
+vector<vector<double>> coordenadasVariables(const vector<double>& valoresPropios, const vector<vector<double>>& vectoresPropios) {
+    int m = valoresPropios.size();
+    vector<vector<double>> matrizT(m, vector<double>(m));
+    //Matriz de coordenadas: T = V / sqrt(lambda)
+    for (int i = 0; i < m; i++) {
+        double lambda = valoresPropios[i];
+        for (int j = 0; j < m; j++) {
+            matrizT[i][j] = vectoresPropios[i][j] * sqrt(lambda);
+        }
+    }
+    return matrizT;
+}
+
+vector<vector<double>> calidadesVariables(const vector<vector<double>>& matrizT, const vector<double>& valoresPropios) {
+    int filas = matrizT.size();
+    int columnas = matrizT[0].size();
+
+    vector<vector<double>> matrizS(filas, vector<double>(columnas));
+
+    for (int i = 0; i < filas; i++) {
+        for (int j = 0; j < columnas; j++) {
+            matrizS[i][j] = (matrizT[i][j] * matrizT[i][j]) / valoresPropios[j];
+        }
+    }
+    return matrizS;
+}
+
+vector<double> vectorInercias(const vector<double>& valoresPropios) {
+    double sumaValores = 0;
+    for (double lambda : valoresPropios) {
+        sumaValores += lambda;
+    }
+
+    vector<double> inercias;
+    for (double lambda : valoresPropios) {
+        inercias.push_back(lambda * 100 / sumaValores);
+    }
+    return inercias;
+}
+
 int main(){
 
     cout << " == Matriz original ==" << endl;
@@ -282,6 +322,23 @@ int main(){
     cout << " == Matriz de calidades de individuos ==" << endl;
     vector<vector<double>> calidadesI = calidades(estandarizada,componentesP);
     imprimirMatriz(calidadesI);
+    cout << endl;
+
+    cout << " == Matriz de coordenadas de variables ==" << endl;
+    vector<vector<double>> matrizT = coordenadasVariables(autovalores, autovectores);
+    imprimirMatriz(matrizT);
+    cout << endl;
+
+    cout << " == Matriz de calidades de variables ==" << endl;
+    vector<vector<double>> matrizS = calidadesVariables(matrizT, autovalores);
+    imprimirMatriz(matrizS);
+    cout << endl;
+
+    cout << " == Vector de inercias ==" << endl;
+    vector<double> vectorI = vectorInercias(autovalores);
+    for (double i : vectorI) {
+        cout << i << " ";
+    }
     cout << endl;
 }
 
