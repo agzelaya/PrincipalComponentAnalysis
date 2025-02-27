@@ -268,6 +268,18 @@ vector<vector<double>> calidadesVariables(const vector<vector<double>>& matrizT,
     return matrizS;
 }
 
+vector<double> vectorInercias(const vector<double>& valoresPropios) {
+    double sumaValores = 0;
+    for (double lambda : valoresPropios) {
+        sumaValores += lambda;
+    }
+
+    vector<double> inercias;
+    for (double lambda : valoresPropios) {
+        inercias.push_back(lambda * 100 / sumaValores);
+    }
+    return inercias;
+}
 
 int main(){
 
@@ -320,6 +332,13 @@ int main(){
     cout << " == Matriz de calidades de variables ==" << endl;
     vector<vector<double>> matrizS = calidadesVariables(matrizT, autovalores);
     imprimirMatriz(matrizS);
+    cout << endl;
+
+    cout << " == Vector de inercias ==" << endl;
+    vector<double> vectorI = vectorInercias(autovalores);
+    for (double i : vectorI) {
+        cout << i << " ";
+    }
     cout << endl;
 }
 
