@@ -241,6 +241,19 @@ vector<vector<double>> calidades(const vector<vector<double>>& matrizX, const ve
     return matrizQ;
 }
 
+vector<vector<double>> coordenadasVariables(const vector<double>& valoresPropios, const vector<vector<double>>& vectoresPropios) {
+    int m = valoresPropios.size();
+    vector<vector<double>> matrizT(m, vector<double>(m));
+    //Matriz de coordenadas: T = V / sqrt(lambda)
+    for (int i = 0; i < m; i++) {
+        double lambda = valoresPropios[i];
+        for (int j = 0; j < m; j++) {
+            matrizT[i][j] = vectoresPropios[i][j] * sqrt(lambda);
+        }
+    }
+    return matrizT;
+}
+
 int main(){
 
     cout << " == Matriz original ==" << endl;
@@ -282,6 +295,11 @@ int main(){
     cout << " == Matriz de calidades de individuos ==" << endl;
     vector<vector<double>> calidadesI = calidades(estandarizada,componentesP);
     imprimirMatriz(calidadesI);
+    cout << endl;
+
+    cout << " == Matriz de coordenadas de variables ==" << endl;
+    vector<vector<double>> matrizT = coordenadasVariables(autovalores, autovectores);
+    imprimirMatriz(matrizT);
     cout << endl;
 }
 
