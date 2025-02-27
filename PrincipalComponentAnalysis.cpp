@@ -6,9 +6,11 @@
 #include <cmath>
 #include <iterator>
 #include <Eigen/Eigenvalues>
+#include "matplotlibcpp.h"
 
 using namespace std;
 using namespace Eigen;
+namespace plt = matplotlibcpp;
 
 void imprimirMatriz(const vector<vector<double>>& matriz) {
     int row = matriz.size();
@@ -323,7 +325,7 @@ int main(){
     vector<vector<double>> calidadesI = calidades(estandarizada,componentesP);
     imprimirMatriz(calidadesI);
     cout << endl;
-
+  
     cout << " == Matriz de coordenadas de variables ==" << endl;
     vector<vector<double>> matrizT = coordenadasVariables(autovalores, autovectores);
     imprimirMatriz(matrizT);
@@ -339,6 +341,9 @@ int main(){
     for (double i : vectorI) {
         cout << i << " ";
     }
-    cout << endl;
+  
+    plt::plot({ 1, 2, 3, 4 }, "*");
+    plt::show();
+    plt::detail::_interpreter::kill();
 }
 
