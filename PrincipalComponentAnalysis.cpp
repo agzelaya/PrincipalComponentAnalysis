@@ -24,8 +24,28 @@ void imprimirMatriz(const vector<vector<double>>& matriz) {
         cout << endl;
     }
 }
+void imprimirMatriz(const vector<vector<string>>& matriz) {
+    int row = matriz.size();
+    int col = matriz[0].size();
 
-vector<vector<double>> leerCSV(const string& nombreArchivo) {
+
+    for (int i = 0; i < row; i++) {
+        for (int j = 0; j < col; j++) {
+            cout << matriz[i][j] << "\t";
+        }
+        cout << endl;
+    }
+}
+pair<vector<double>, vector<double>> getColumnas(const vector<vector<double>>& matriz, int columna1, int columna2) {
+    vector<double> columna1V,columna2V;
+	for (int i = 0; i < matriz.size(); i++) {
+		columna1V.push_back(matriz[i][columna1]);
+		columna2V.push_back(matriz[i][columna2]);
+	}
+	return { columna1V,columna2V };
+}
+
+vector<vector<double>> leerCSV(const string& nombreArchivo,vector<string>& y_values, vector<string>& x_values) {
     ifstream archivo(nombreArchivo);
     vector<vector<double>> datos;
     string linea;
@@ -35,14 +55,25 @@ vector<vector<double>> leerCSV(const string& nombreArchivo) {
         return datos;
     }
 
-    getline(archivo, linea);
+    //XValues
+    if (getline(archivo, linea)) {
+        stringstream ss(linea);
+        string materia;
+        getline(ss, materia, ';'); // Saltar primer valor vacío
+        while (getline(ss, materia, ';')) {
+            x_values.push_back(materia);
+        }
+    }
+
     while (getline(archivo, linea)) {
         stringstream ss(linea);
         string valor;
         vector<double> fila;
 
-        // skipea los nombres
-        getline(ss, valor, ';');
+        //YValues
+        if (getline(ss, valor, ';')) {
+            y_values.push_back(valor);
+        }
 
         while (getline(ss, valor, ';')) {
             // cambia ',' por '.' para decimales
@@ -87,7 +118,7 @@ vector<vector<double>> estandarizar(const vector<vector<double>>& matriz) {
             sum2 += pow(matriz[j][i] - media[i],2);
         }
         avg = sqrt(sum2 / (row ));
-		cout << avg << endl;
+		//cout << avg << endl;
 
         desviacionEstandar.push_back(avg);
         sum2 = 0;
@@ -156,7 +187,7 @@ pair<vector<double>, vector<vector<double>>> calcularValoresVectoresPropios(cons
 
     VectorXd valoresPropios = solver.eigenvalues();  
     MatrixXd vectoresPropios = solver.eigenvectors();
-
+	cout << "Eigenvectors: " << solver.eigenvectors() << endl;
 
     VectorXd valoresOrdenados = valoresPropios.reverse();
     vector<double> valoresOV;
@@ -283,14 +314,65 @@ vector<double> vectorInercias(const vector<double>& valoresPropios) {
     return inercias;
 }
 
+void PlanoPrincipal(vector<string>& etiquetas, vector<vector<double>> componentesP, int columna1, int columna2) {
+
+    pair<vector<double>, vector<double>> columnas = getColumnas(componentesP, columna1, columna2);
+    vector<double> C1 = columnas.first;
+    vector<double> C2 = columnas.second;
+
+    plt::scatter(C1, C2, 100);
+
+    for (size_t i = 0; i < C1.size(); ++i) {
+        plt::annotate(etiquetas[i], C1[i], C2[i]);
+    }
+
+    plt::xlabel(("Componente "+ to_string(columna1)));
+    plt::ylabel(("Componente "+ to_string(columna2)));
+    plt::title("Plano Principal");
+    plt::grid(true);
+    plt::show();
+}
+void Circulo_Correlacion(vector<string>& etiquetas, vector<vector<double>> componentesP, int columna1, int columna2, vector<double>vectorI) {
+    
+    pair<vector<double>, vector<double>> columnas = getColumnas(componentesP, columna1, columna2);
+    vector<double> T1 = columnas.first;
+    vector<double> T2 = columnas.second;
+    double x = vectorI[columna1], y = vectorI[columna2];
+
+    plt::figure_size(600, 600);
+
+    plt::plot({ -1.0, 1.0 }, { 0, 0 }, "k--"); // Horizontal line (black, dashed)
+    plt::plot({ 0, 0 }, { -1.0, 1.0 }, "k--");
+
+    for (int i = 0; i < T1.size(); ++i) {
+		plt::arrow(0.0, 0.0, T1[i], T2[i],  "orange");
+        plt::annotate(etiquetas[i], T1[i], T2[i]);
+    }
+
+    vector<double> x_circle, y_circle;
+    for (double t = 0; t <= (2 * 3.1416); t += 0.01) {
+        x_circle.push_back(cos(t));
+        y_circle.push_back(sin(t));
+    }
+    plt::plot(x_circle, y_circle, "orange");
+    
+    plt::xlabel(("Componente " + to_string(columna1)+ " (" + to_string(x) +"%)"));
+    plt::ylabel(("Componente " + to_string(columna2) + " (" + to_string(y) + "%)"));
+    plt::title("Circulo de Correlacion");
+    plt::axis("equal");
+    plt::grid(true);
+    plt::show();
+}
+
 int main(){
 
     cout << " == Matriz original ==" << endl;
-	vector<vector<double>> original = leerCSV("EjemploEstudiantes.csv");
+    vector<string> nombres, materias;
+    vector<vector<double>> original = leerCSV("EjemploEstudiantes.csv", nombres, materias);
     imprimirMatriz(original);
-    cout << endl << endl;
+    cout << endl ;
 
-    vector<vector<double>> estandarizada = estandarizar(leerCSV("EjemploEstudiantes.csv"));
+    vector<vector<double>> estandarizada = estandarizar(original);
     cout << " == Matriz estandarizada ==" << endl;
     imprimirMatriz(estandarizada);
     cout << endl << endl;
@@ -341,9 +423,13 @@ int main(){
     for (double i : vectorI) {
         cout << i << " ";
     }
-  
-    plt::plot({ 1, 2, 3, 4 }, "*");
-    plt::show();
-    plt::detail::_interpreter::kill();
+    cout << endl;
+
+    //Graficos
+    PlanoPrincipal(nombres, componentesP, 0, 1);
+    PlanoPrincipal(nombres, componentesP, 3, 4);
+	Circulo_Correlacion(materias,matrizT,0,1, vectorI);
+    Circulo_Correlacion(materias, matrizT, 3, 4, vectorI);
+
 }
 
