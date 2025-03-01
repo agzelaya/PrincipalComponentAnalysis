@@ -7,6 +7,13 @@
 #include <iterator>
 #include <Eigen/Eigenvalues>
 #include "matplotlibcpp.h"
+#include <cmath>
+
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
+
 
 using namespace std;
 using namespace Eigen;
@@ -332,8 +339,10 @@ void PlanoPrincipal(vector<string>& etiquetas, vector<vector<double>> componente
     plt::grid(true);
     plt::show();
 }
+
+
 void Circulo_Correlacion(vector<string>& etiquetas, vector<vector<double>> componentesP, int columna1, int columna2, vector<double>vectorI) {
-    
+
     pair<vector<double>, vector<double>> columnas = getColumnas(componentesP, columna1, columna2);
     vector<double> T1 = columnas.first;
     vector<double> T2 = columnas.second;
@@ -341,22 +350,48 @@ void Circulo_Correlacion(vector<string>& etiquetas, vector<vector<double>> compo
 
     plt::figure_size(600, 600);
 
-    plt::plot({ -1.0, 1.0 }, { 0, 0 }, "k--"); // Horizontal line (black, dashed)
+    plt::plot({ -1.0, 1.0 }, { 0, 0 }, "k--"); 
     plt::plot({ 0, 0 }, { -1.0, 1.0 }, "k--");
 
+    double scale_factor = 0.95; 
     for (int i = 0; i < T1.size(); ++i) {
-		plt::arrow(0.0, 0.0, T1[i], T2[i],  "orange");
-        plt::annotate(etiquetas[i], T1[i], T2[i]);
+        double length = std::sqrt(T1[i] * T1[i] + T2[i] * T2[i]);
+
+        if (length > 0) { 
+            T1[i] /= length; 
+            T2[i] /= length;
+        }
+
+        plt::plot({ 0.0, T1[i] * scale_factor }, { 0.0, T2[i] * scale_factor }, "orange");
+
+        double arrow_size = 0.05;
+        double angle = std::atan2(T2[i], T1[i]);
+
+        double x1 = T1[i] - arrow_size * std::cos(angle - M_PI / 6);
+        double y1 = T2[i] - arrow_size * std::sin(angle - M_PI / 6);
+        double x2 = T1[i] - arrow_size * std::cos(angle + M_PI / 6);
+        double y2 = T2[i] - arrow_size * std::sin(angle + M_PI / 6);
+
+        plt::plot({ T1[i] * scale_factor, x1 * scale_factor }, { T2[i] * scale_factor, y1 * scale_factor }, "orange");
+        plt::plot({ T1[i] * scale_factor, x2 * scale_factor }, { T2[i] * scale_factor, y2 * scale_factor }, "orange");
+
+        plt::annotate(etiquetas[i], T1[i] * scale_factor, T2[i] * scale_factor);
     }
 
-    vector<double> x_circle, y_circle;
-    for (double t = 0; t <= (2 * 3.1416); t += 0.01) {
-        x_circle.push_back(cos(t));
-        y_circle.push_back(sin(t));
-    }
-    plt::plot(x_circle, y_circle, "orange");
     
-    plt::xlabel(("Componente " + to_string(columna1)+ " (" + to_string(x) +"%)"));
+    int num_points = 500; 
+    std::vector<double> circle_x, circle_y;
+    double radius = 1.0;  
+
+    for (int i = 0; i < num_points; ++i) {
+        double angle = 2 * 3.141592 * i / num_points;
+        circle_x.push_back(radius * std::cos(angle));
+        circle_y.push_back(radius * std::sin(angle));
+    }
+
+    
+    plt::plot(circle_x, circle_y, "orange");  
+    plt::xlabel(("Componente " + to_string(columna1) + " (" + to_string(x) + "%)"));
     plt::ylabel(("Componente " + to_string(columna2) + " (" + to_string(y) + "%)"));
     plt::title("Circulo de Correlacion");
     plt::axis("equal");
