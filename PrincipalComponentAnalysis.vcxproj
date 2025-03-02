@@ -71,8 +71,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>C:\Users\andgz\AppData\Local\Programs\Python\Python312\include;C:\Users\andgz\AppData\Local\Programs\Python\Python312\Lib\site-packages\numpy\core\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\andgz\AppData\Local\Programs\Python\Python312\libs;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Python312\include;C:\Users\andgz\AppData\Local\Programs\Python\Python312\include;C:\Python312\Lib\site-packages\numpy\_core\include;C:\Users\andgz\AppData\Local\Programs\Python\Python312\Lib\site-packages\numpy\core\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Python312\libs;C:\Users\andgz\AppData\Local\Programs\Python\Python312\libs;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LibraryPath>C:\Users\andgz\AppData\Local\Programs\Python\Python312\libs;$(LibraryPath)</LibraryPath>
@@ -127,7 +127,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\andgz\OneDrive\Documents\Lenguajes de programacion\eigen-3.4.0\eigen-3.4.0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\tatig\Documents\Unitec 2025\Lenguajes\Proyecto\eigen-3.4.0;C:\Users\andgz\OneDrive\Documents\Lenguajes de programacion\eigen-3.4.0\eigen-3.4.0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

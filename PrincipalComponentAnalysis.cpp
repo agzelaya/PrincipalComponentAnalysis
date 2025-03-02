@@ -13,12 +13,11 @@
 #define M_PI 3.14159265358979323846
 #endif
 
-
-
 using namespace std;
 using namespace Eigen;
 namespace plt = matplotlibcpp;
 
+//Metodos para el programador: Impresion de matrices y obtencion de columnas
 void imprimirMatriz(const vector<vector<double>>& matriz) {
     int row = matriz.size();
     int col = matriz[0].size();
@@ -52,6 +51,7 @@ pair<vector<double>, vector<double>> getColumnas(const vector<vector<double>>& m
 	return { columna1V,columna2V };
 }
 
+//Lectura de archivos CSV
 vector<vector<double>> leerCSV(const string& nombreArchivo,vector<string>& y_values, vector<string>& x_values) {
     ifstream archivo(nombreArchivo);
     vector<vector<double>> datos;
@@ -96,6 +96,7 @@ vector<vector<double>> leerCSV(const string& nombreArchivo,vector<string>& y_val
     return datos;
 }
 
+//Metodo para centrar y reducir la tabla original de datos X (Paso 1)
 vector<vector<double>> estandarizar(const vector<vector<double>>& matriz) {
     vector<double> media;
     vector<double> desviacionEstandar;
@@ -152,6 +153,7 @@ vector<vector<double>> estandarizar(const vector<vector<double>>& matriz) {
     return matrizE;
 }
 
+//Metodo para calcular la matriz de correlaciones (Paso 2)
 vector<vector<double>> correlaciones(const vector<vector<double>>& matriz) {
     vector<vector<double>> matrizCorrelacion;
 
@@ -179,6 +181,7 @@ vector<vector<double>> correlaciones(const vector<vector<double>>& matriz) {
     return matrizCorrelacion;
 }
 
+//Metodo para calcular los valores propios y vectores propios y ordenarlos de mayor a menor (Paso 3 y 4)
 pair<vector<double>, vector<vector<double>>> calcularValoresVectoresPropios(const vector<vector<double>>& matriz) {
     int row = matriz.size();  
 
@@ -190,11 +193,11 @@ pair<vector<double>, vector<vector<double>>> calcularValoresVectoresPropios(cons
         }
     }
 
-    SelfAdjointEigenSolver<MatrixXd> solver(mat);
+	SelfAdjointEigenSolver<MatrixXd> solver(mat); //Clase para calcular valores propios y vectores propios
 
-    VectorXd valoresPropios = solver.eigenvalues();  
-    MatrixXd vectoresPropios = solver.eigenvectors();
-	cout << "Eigenvectors: " << solver.eigenvectors() << endl;
+	VectorXd valoresPropios = solver.eigenvalues(); //valores propios  
+	MatrixXd vectoresPropios = solver.eigenvectors();//vectores propios
+	//cout << "Eigenvectors: " << solver.eigenvectors() << endl;
 
     VectorXd valoresOrdenados = valoresPropios.reverse();
     vector<double> valoresOV;
@@ -225,6 +228,7 @@ pair<vector<double>, vector<vector<double>>> calcularValoresVectoresPropios(cons
     return{valoresOV, vectoresOrdenados};
 }
 
+//Metodo para calcular las componentes principales (Paso 5)
 vector<vector<double>> componentes(const vector<vector<double>>& matrizX, const vector<vector<double>>& matrizV) {
     vector<vector<double>> matrizC;
     vector<double> temp;
@@ -253,13 +257,14 @@ vector<vector<double>> componentes(const vector<vector<double>>& matrizX, const 
     return matrizC;
 }
 
+//Metodo para calcular las calidades de los individuos (Paso 6)
 vector<vector<double>> calidades(const vector<vector<double>>& matrizX, const vector<vector<double>>& matrizC) {
     vector<vector<double>> matrizQ;
     vector<double> temp;
 
     int row = matrizX.size();
     int col = matrizX[0].size();
-    double calculo = 0, suma = 0;//variable para los calculos de cada elemento de la matriz
+	double calculo = 0, suma = 0;//variable para los calculos de cada elemento de la matriz y suma de elementos 
 
     for (int i = 0; i < row; i++)
     {
@@ -281,6 +286,7 @@ vector<vector<double>> calidades(const vector<vector<double>>& matrizX, const ve
     return matrizQ;
 }
 
+//Metodo para calcular las coordenadas de las variables (Paso 7)
 vector<vector<double>> coordenadasVariables(const vector<double>& valoresPropios, const vector<vector<double>>& vectoresPropios) {
     int m = valoresPropios.size();
     vector<vector<double>> matrizT(m, vector<double>(m));
@@ -294,6 +300,7 @@ vector<vector<double>> coordenadasVariables(const vector<double>& valoresPropios
     return matrizT;
 }
 
+//Metodo para calcular las calidades de las variables (Paso 8)
 vector<vector<double>> calidadesVariables(const vector<vector<double>>& matrizT, const vector<double>& valoresPropios) {
     int filas = matrizT.size();
     int columnas = matrizT[0].size();
@@ -308,6 +315,7 @@ vector<vector<double>> calidadesVariables(const vector<vector<double>>& matrizT,
     return matrizS;
 }
 
+//Metodo para calcular el vector de inercias (Paso 9)
 vector<double> vectorInercias(const vector<double>& valoresPropios) {
     double sumaValores = 0;
     for (double lambda : valoresPropios) {
@@ -321,13 +329,14 @@ vector<double> vectorInercias(const vector<double>& valoresPropios) {
     return inercias;
 }
 
+//Metodos para graficar
 void PlanoPrincipal(vector<string>& etiquetas, vector<vector<double>> componentesP, int columna1, int columna2) {
 
     pair<vector<double>, vector<double>> columnas = getColumnas(componentesP, columna1, columna2);
     vector<double> C1 = columnas.first;
     vector<double> C2 = columnas.second;
 
-    plt::scatter(C1, C2, 100);
+	plt::scatter(C1, C2, 100);//Grafico de dispersion
 
     for (size_t i = 0; i < C1.size(); ++i) {
         plt::annotate(etiquetas[i], C1[i], C2[i]);
@@ -336,24 +345,23 @@ void PlanoPrincipal(vector<string>& etiquetas, vector<vector<double>> componente
     plt::xlabel(("Componente "+ to_string(columna1)));
     plt::ylabel(("Componente "+ to_string(columna2)));
     plt::title("Plano Principal");
-    plt::grid(true);
+    plt::grid(true);//Los cuadriculas del grafico
     plt::show();
 }
+void Circulo_Correlacion(vector<string>& etiquetas, vector<vector<double>> matrizT, int columna1, int columna2, vector<double>vectorI) {
 
-
-void Circulo_Correlacion(vector<string>& etiquetas, vector<vector<double>> componentesP, int columna1, int columna2, vector<double>vectorI) {
-
-    pair<vector<double>, vector<double>> columnas = getColumnas(componentesP, columna1, columna2);
+    pair<vector<double>, vector<double>> columnas = getColumnas(matrizT, columna1, columna2);
     vector<double> T1 = columnas.first;
     vector<double> T2 = columnas.second;
     double x = vectorI[columna1], y = vectorI[columna2];
 
     plt::figure_size(600, 600);
 
-    plt::plot({ -1.0, 1.0 }, { 0, 0 }, "k--"); 
+    plt::plot({ -1.0, 1.0 }, { 0, 0 }, "k--");
     plt::plot({ 0, 0 }, { -1.0, 1.0 }, "k--");
 
-    double scale_factor = 0.95; 
+    //Grafico de las flechas
+	double scale_factor = 0.95; 
     for (int i = 0; i < T1.size(); ++i) {
         double length = std::sqrt(T1[i] * T1[i] + T2[i] * T2[i]);
 
@@ -378,7 +386,7 @@ void Circulo_Correlacion(vector<string>& etiquetas, vector<vector<double>> compo
         plt::annotate(etiquetas[i], T1[i] * scale_factor, T2[i] * scale_factor);
     }
 
-    
+	//Grafico del circulo
     int num_points = 500; 
     std::vector<double> circle_x, circle_y;
     double radius = 1.0;  
@@ -389,7 +397,7 @@ void Circulo_Correlacion(vector<string>& etiquetas, vector<vector<double>> compo
         circle_y.push_back(radius * std::sin(angle));
     }
 
-    
+    //Datos y edicion del grafico
     plt::plot(circle_x, circle_y, "orange");  
     plt::xlabel(("Componente " + to_string(columna1) + " (" + to_string(x) + "%)"));
     plt::ylabel(("Componente " + to_string(columna2) + " (" + to_string(y) + "%)"));
@@ -426,7 +434,6 @@ int main(){
     for (int i = 0; i < autovalores.size(); i++) {
         cout << autovalores[i] << " ";
     }
- 
     cout << endl << endl;
 
     cout << " == Vectores propios ==" << endl;
