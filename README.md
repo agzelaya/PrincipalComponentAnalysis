@@ -1,7 +1,6 @@
 
 ## Análisis de Componentes Principales (ACP) en C++
 
-![Static Badge](https://img.shields.io/badge/Lenguaje-C%2B%2B)
 Este proyecto implementa el **Análisis de Componentes Principales (ACP) en C++** para reducir la dimensionalidad de un conjunto de datos y visualizar la información en un espacio de menor dimensión. El objetivo fue comprender las diferencias en la programación de este problema en distintos lenguajes, como **Python**, que es *fuertemente tipado y dinámico*, y **C++**, que es *débilmente tipado y estático*. 
 
 ### Muestra del Proyecto
